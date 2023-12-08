@@ -212,6 +212,7 @@ form.addEventListener('submit', async (e)=> {
 
         imgInput.src = "./image/Profile Icon.webp"  
     }
+    
     else{
         const dbRef = doc(db,"products",inpIDSP.value)
         const data = {
@@ -233,8 +234,12 @@ form.addEventListener('submit', async (e)=> {
             announce("error","Cập nhật sản phẩm không thành công")
         }
 
-        modal.style.display = "none"
-        document.querySelector(".modal-backdrop").remove()
+        simulateClick()
+
+        form.reset()
+        imgInput.src = "./image/Profile Icon.webp"
+        // modal.style.display = "none"
+        // document.querySelector(".modal-backdrop").remove()
         
     }
     resetTable()
@@ -280,4 +285,14 @@ function announce(trangThai,tb){
         icon: trangThai,
         title: tb
       });
+}
+
+function simulateClick() {
+    var btnToClick = document.getElementById('btnToggleModal');
+
+    // Tạo một sự kiện click mới
+    var clickEvent = new Event('click');
+
+    // Gửi sự kiện click tới button
+    btnToClick.dispatchEvent(clickEvent);
 }

@@ -58,7 +58,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-
+// Dùng để validate khi nhập giá tiền trong input 
+// Cần phải bắt sự kiện mỗi lần nhập chữ là khong nhận
+// Nhập số thì tăng lên và có dấu chấm ngắn cách 
 function formatPriceInp(input) {
     // Lấy giá trị từ input
     let inputValue = input.value;
@@ -83,3 +85,16 @@ function formatPrice(num){
     num = num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
     return num
 }
+
+
+// Đoạn code này dùng để bắt sự kiện mỗi lần tắt form 
+document.addEventListener('DOMContentLoaded', function () {
+    var userFormModal = document.getElementById('userForm');
+
+    userFormModal.addEventListener('hidden.bs.modal', function () {
+        let form = document.getElementById("myForm")
+        form.reset()
+        
+        imgInput.src = "./image/Profile Icon.webp"
+    });
+});

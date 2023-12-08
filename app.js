@@ -1,4 +1,6 @@
 import {addDoc,doc,setDoc,deleteDoc,collection,getFirestore, getDocs,updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+
+
 const db = getFirestore()
 const dbRef = collection(db,"products")
 
@@ -43,7 +45,6 @@ const getProducts = async () =>{
 }
 getProducts()
 
-let isEdit = false, editId
 
 newUserBtn.addEventListener('click', ()=> {
     submitBtn.innerText = 'Submit',
@@ -73,24 +74,62 @@ file.onchange = function(){
 
 
 async function deleteInfo(idsp){
-    if(confirm("Are you sure want to delete?")){
-        const dbRefToDelete = doc(db, "products", idsp);
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "btn btn-success",
+          cancelButton: "btn btn-danger"
+        },
+        buttonsStyling: false
+    });
+      swalWithBootstrapButtons.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+
+            const dbRefToDelete = doc(db, "products", idsp);
   
-        try{
-            await deleteDoc(dbRefToDelete,data)
-            .then(()=>{
-                alert("Delete thanh cong")
-            })
-        }
-        catch (err){
-            console.log(err);
-        }
+            try{
+                await deleteDoc(dbRefToDelete,data)
+                .then(()=>{
+                    announce("success","Xóa sản phẩm thành công")
+                })
+            }
+            catch (err){
+                console.log(err);
+                announce("error","Xóa sản phẩm không thành công")
+            }
         
         resetTable()
         products = []
         getProducts()
-        
-    }
+
+          swalWithBootstrapButtons.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success"
+          });
+        } else if (
+          /* Read more about handling dismissals below */
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire({
+            title: "Cancelled",
+            text: "Your imaginary file is safe :)",
+            icon: "error"
+          });
+        }
+    });
+
+
+
+    
   }
 
 
@@ -104,12 +143,12 @@ function showInfo(products){
             <td><img src="${element.hinhanh}" alt="" width="50" height="50"></td>
             <td>${element.tensp}</td>
             <td>${element.slg}</td>
-            <td>${element.giaVon}</td>
-            <td>${element.giaBan}</td>
+            <td> ${formatPrice(element.giaVon)}</td>
+            <td>${formatPrice(element.giaBan)}</td>
             <td>${element.ngayNhapHang}</td>
             <td>
                 
-                <button class="btn btn-success" onclick="readInfo('${element.hinhanh}', '${element.tensp}', '${element.slg}', '${element.giaVon}', '${element.giaBan}', '${element.ngayNhapHang}')" data-bs-toggle="modal" data-bs-target="#readData"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-success" onclick="readInfo('${element.hinhanh}', '${element.tensp}', '${element.slg}', '${ element.giaVon}', '${element.giaBan}', '${element.ngayNhapHang}')" data-bs-toggle="modal" data-bs-target="#readData"><i class="bi bi-eye"></i></button>
 
                 <button class="btn btn-primary" onclick="editInfo('${element.id}','${element.hinhanh}', '${element.tensp}', '${element.slg}', '${element.giaVon}', '${element.giaBan}', '${element.ngayNhapHang}')" data-bs-toggle="modal" data-bs-target="#userForm"><i class="bi bi-pencil-square"></i></button>
 
@@ -158,29 +197,23 @@ form.addEventListener('submit', async (e)=> {
                 ngayNhapHang:information.startDate,
                 hinhanh: information.picture
             })
+            .then(()=>{
+                announce("success","Thêm sản phẩm thành công")
+            })
         }
         catch (err){
             console.log(err);
+            announce("error","Cập nhật sản phẩm không thành công")
         }
         submitBtn.innerText = "Submit"
         modalTitle.innerHTML = "Fill The Form"
-
-        
-
-
         form.reset()
-
-       setDay()
+        setDay()
 
         imgInput.src = "./image/Profile Icon.webp"  
-
-        
-
     }
     else{
-
         const dbRef = doc(db,"products",inpIDSP.value)
-        
         const data = {
             tensp:userName.value,
             slg:age.value,
@@ -192,22 +225,27 @@ form.addEventListener('submit', async (e)=> {
         try{
             await updateDoc(dbRef,data)
             .then(()=>{
-                alert("Update thanh cong")
+                announce("success","Cập nhật sản phẩm thành công")
             })
         }
         catch (err){
             console.log(err);
+            announce("error","Cập nhật sản phẩm không thành công")
         }
+
+        modal.style.display = "none"
+        document.querySelector(".modal-backdrop").remove()
         
     }
     resetTable()
-        products = []
-        getProducts()
+    products = []
+    getProducts()
 
-    // location.reload()
     
     
 })
+
+// Các function giao diện
 
 function setDay(){
     const currentDate = new Date();
@@ -217,4 +255,29 @@ function setDay(){
 
     // Đặt giá trị cho trường ngày
     document.getElementById('sDate').value = formattedDate;
+}
+function formatPrice(num){
+    num = num.replace(/\./g, '');
+
+    // Chèn dấu chấm phân cách hàng nghìn
+    num = num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    return num
+}
+
+function announce(trangThai,tb){
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      });
+      Toast.fire({
+        icon: trangThai,
+        title: tb
+      });
 }

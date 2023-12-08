@@ -5,8 +5,8 @@ function readInfo(hinhanh, tensp, slg, giaVon, giaBan, sDate){
     document.querySelector('.showImg').src = hinhanh,
     document.querySelector('#showName').value = tensp,
     document.querySelector("#showAge").value = slg,
-    document.querySelector("#showEmail").value = giaVon,
-    document.querySelector("#showPhone").value = giaBan,
+    document.querySelector("#showEmail").value = formatPrice(giaVon),
+    document.querySelector("#showPhone").value = formatPrice(giaBan),
     document.querySelector("#showsDate").value = sDate
 }
 
@@ -36,6 +36,8 @@ function editInfo(idsp,hinhanh, tensp, slg, giaVon, giaBan, ngayNhapHang){
 
 
 
+
+
 function resetTable(){
     document.querySelectorAll('.employeeDetails').forEach(info => info.remove())
 }
@@ -55,3 +57,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+
+function formatPriceInp(input) {
+    // Lấy giá trị từ input
+    let inputValue = input.value;
+
+    // Xóa các dấu chấm phân cách hàng nghìn
+    let numericValue = inputValue.replace(/[^\d.]/g, '');
+
+    // Xóa các dấu chấm phân cách hàng nghìn
+    numericValue = numericValue.replace(/\./g, '');
+
+    // Chèn dấu chấm phân cách hàng nghìn
+    numericValue = numericValue.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+
+    // Gán giá trị đã định dạng trở lại cho input
+    input.value = numericValue;
+}
+
+function formatPrice(num){
+    num = num.replace(/\./g, '');
+
+    // Chèn dấu chấm phân cách hàng nghìn
+    num = num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    return num
+}

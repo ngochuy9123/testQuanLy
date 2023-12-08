@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     userFormModal.addEventListener('hidden.bs.modal', function () {
         let form = document.getElementById("myForm")
+        let imgInput = document.querySelector(".img")
         form.reset()
         
         imgInput.src = "./image/Profile Icon.webp"
